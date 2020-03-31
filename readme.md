@@ -1,5 +1,6 @@
 # Can't add errors using the Callback constraint.
 Small reproducer that show a callback validator can't add a violation.
+Issue in the tracker: https://github.com/symfony/symfony/issues/36287
 
 **Expected validation error: you cannot add a game if customer is not checked.**
 
