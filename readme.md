@@ -36,6 +36,7 @@ I guess this path by having a look at the debug bar. Uncomment `new EqualTo(fals
 * composer install
 * php bin/console server:start
 * navigate to https://127.0.0.1:8000/form
+* check the the controller `App\Controller\FormController` located in  src/Controller/FormControllers
 
 ## Environment:
 
