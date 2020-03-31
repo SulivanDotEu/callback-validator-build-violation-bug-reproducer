@@ -1,0 +1,101 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Debug form{% endblock %}
+
+{% block body %}
+    <style>
+        .example-wrapper {
+            margin: 1em auto;
+            max-width: 800px;
+            width: 95%;
+            font: 18px/1.5 sans-serif;
+        }
+
+        .example-wrapper code {
+            background: #F5F5F5;
+            padding: 2px 6px;
+        }
+    </style>
+
+    <div class="example-wrapper">
+        <h1>Can't add errors using the Callback constraint.</h1>
+        {{ form_start(form) }}
+
+        <p class="lead">
+            Small reproducer that show a callback validator can't add a violation.
+        </p>
+        <p>
+            <b>Expected validation error: you cannot add a game if customer is not checked.</b>
+        </p>
+        <p>
+            Adding errors using
+            <code>$field->addError(new FormError('Customer subscription required'));</code>
+            is working but not using the Callback constraints.
+        </p>
+        <p>
+            A <code>Callback</code> constraint is added to the form using this:
+        </p>
+
+        <pre><code>$form = $this->createFormBuilder($formData, [
+    'constraints' => [
+        new Callback([$this, 'validateCustomerSubscription']),
+    ],
+])</code></pre>
+
+        <p>
+            But it is not possible to attach error to the field using this lines of code:
+        </p>
+        <pre><code>$context
+    ->buildViolation('Customer subscription required')
+    -><b>atPath</b>("children[games].children[$customerId].children[$gameId].data")
+    ->addViolation();</code></pre>
+
+        <p>
+            The problem is due to the <b>path</b> <code>children[games].children[$customerId].children[$gameId].data</code>
+            being modified to
+            <code><b>data.</b>children[games].children[$customerId].children[$gameId].data</code>.
+        </p>
+
+        <p>
+            I guess this path by having a look at the debug bar.
+            Uncomment <code>new EqualTo(false)</code> to compare.
+        </p>
+
+        <table class="table table-bordered">
+            <thead>
+            <tr class="">
+                <th rowspan="2">Games</th>
+                <th colspan="{{ customers|length }}" class="text-center">
+                    Customers <br/>
+                    <small>You cannot add a game if customer is not checked.</small>
+                </th>
+            </tr>
+            <tr class="">
+                {% for customerId, customer in customers %}
+                    <th>
+                        {{ form_widget(form.customers[customerId], {label: customer}) }}
+                    </th>
+                {% endfor %}
+            </tr>
+            </thead>
+            <tbody>
+            {% for gameId, game in games %}
+                <tr>
+                    <td>{{ game }}</td>
+                    {% for customerId, customer in customers %}
+                        <td>
+                            {{ form_widget(form.games[customerId][gameId], {label: game}) }}
+                        </td>
+                    {% endfor %}
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+
+        {{ form_widget(form.submit, {attr:{class:'btn btn-primary btn-lg btn-block'}}) }}
+{#        {{ form_errors(form) }}#}
+
+        {{ form_end(form) }}
+
+    </div>
+{% endblock %}
