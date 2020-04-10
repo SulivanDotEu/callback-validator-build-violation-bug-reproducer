@@ -93,7 +93,7 @@ class FormController extends AbstractController
 
                         $context
                             ->buildViolation('Customer subscription required')
-                            ->atPath("children[games].children[$customerId].children[$gameId].data")
+                            ->atPath("[games][$customerId][$gameId]")
                             ->addViolation();
                     }
                 }
